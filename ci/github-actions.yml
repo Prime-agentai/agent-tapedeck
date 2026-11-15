@@ -1,0 +1,22 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python: ["3.10", "3.11", "3.12", "3.13"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      # No claude/codex/gemini binary and no API key exist here: every agent call is a replay.
+      - name: Offline check
+        env:
+          PYTHON: python
+        run: uv run --python ${{ matrix.python }} --with pytest --with mypy ./scripts/check.sh
