@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "agent-tapedeck"
-version = "0.1.0"
+version = "0.2.0"
 description = "Record and replay coding-agent CLIs (Claude Code, Codex, Gemini CLI), including the files they write, for fast deterministic tests."
 readme = "README.md"
 license = { text = "MIT" }

@@ -241,3 +241,11 @@ def test_synth_claude_shapes() -> None:
     assert synth_interaction("codex", "plain", fmt="text").events[0].data == b"plain\n"
     with pytest.raises(ValueError):
         synth_interaction("claude", "x", fmt="xml")
+
+
+def test_normalizer_replaces_whole_path_components_only() -> None:
+    n = Normalizer(cwd="/work/proj", home="/home/user", tmp="/tmp")
+    assert n.text("/tmp/tmpab12cd34/x.py") == "<tmp>/tmp<rand>/x.py"
+    assert n.text("/tmp/tmpab12cd34/x.py") == n.text("/tmp/tmpzz99yy88/x.py")
+    assert n.text("/home/user/a /home/username/b") == "<home>/a /home/username/b"
+    assert n.text("/work/proj/src /work/project") == "<cwd>/src /work/project"

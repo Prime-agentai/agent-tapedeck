@@ -45,7 +45,8 @@ class Normalizer:
         subs = [(CWD_TOKEN, "<cwd>"), (self.cwd, "<cwd>"), (os.path.realpath(self.cwd), "<cwd>")]
         subs += [(self.tmp, "<tmp>"), ("/tmp", "<tmp>"), (self.home, "<home>")]
         for old, new in sorted({s for s in subs if s[0] and len(s[0]) > 1}, key=lambda s: -len(s[0])):
-            value = value.replace(old, new)
+            # Only whole path components: "/tmp" must not eat the start of "/tmpab12cd34".
+            value = re.sub(re.escape(old) + r"(?![\w.-])", new.replace("\\", r"\\"), value)
         value = _PYTEST_TMP.sub("<pytest>", value)
         value = _UUID.sub("<uuid>", value)
         return _TMP_RANDOM.sub("tmp<rand>", value)

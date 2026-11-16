@@ -2,7 +2,8 @@
 
 > **VCR for coding agents.** Record a Claude Code, Codex or Gemini CLI run once (its output,
 > its exit code *and every file it wrote*), then replay it in CI in milliseconds, with no API
-> key, no network and no flakiness.
+> key, no network and no flakiness. When you switch models or CLI versions, `tapedeck diff` shows
+> what the agent now *does* differently: tools called, files written, final reply.
 
 ![python](https://img.shields.io/badge/python-3.10%2B-blue) ![deps](https://img.shields.io/badge/runtime%20deps-0-brightgreen) ![license](https://img.shields.io/badge/license-MIT-green)
 
@@ -95,6 +96,49 @@ with use_cassette("tests/cassettes/run.json", mode="once", bins=["claude"]) as d
     print(deck.calls())                   # [{'program': 'claude', 'action': 'replay', ...}]
 ```
 
+## Behaviour drift: `tapedeck diff`
+
+A byte diff of two recordings is noise: session ids, timings, token counts and thinking text change on every run. `tapedeck diff` compares behaviour instead, per call: the **request**, the **exit** code, the ordered **tool** calls, the **files** written, and the final **result** (structurally, when both sides are JSON). Turns, cost and duration are reported but never fail the diff.
+
+Same task, same starting `calc.py`, recorded from real Claude Code with `--model haiku` and `--model sonnet` ([both cassettes are in the repo](examples/cassettes/)):
+
+```console
+$ tapedeck diff examples/cassettes/drift_haiku.json examples/cassettes/drift_sonnet.json
+CHANGED  #0 -> #0  claude -p calc.py has a bug. Fix it, add a pytest test file for add(), run the tests with python -m
+  request argv changed
+          ~ argv[6]: haiku -> sonnet
+  tools   4 -> 4 tool calls (Bash 2->1, Edit 1->0, Read 0->1, Write 1->2)
+          - Bash ls -la && cat calc.py
+          - Edit calc.py
+          + Read calc.py
+          + Write calc.py
+          - Bash python -m pytest -q
+          + Bash python -m pytest -q 2>&1 | tail -5
+  files   1 changed
+          ~ test_calc.py (+5/-14 lines)
+            ...
+  result  final reply text changed
+          -```json
+           {"fixed": true, "files": ["calc.py", "test_calc.py"]}
+          -```
+  stats   cost $0.0028 -> $0.0446, duration 9.3s -> 7.2s
+tapedeck diff: 0 same, 1 changed, 0 added, 0 removed
+$ echo $?
+1
+```
+
+Both models fixed the bug. Only the diff shows that haiku wrapped its JSON reply in a Markdown fence, which breaks a pipeline that runs `json.loads` on the result.
+
+```bash
+tapedeck diff old.json new.json                       # exit 1 on any behavioural change
+tapedeck diff tests/cassettes/run.json                # working tree vs. git HEAD (after a re-record)
+tapedeck diff a.json b.json --ignore-flag=--model     # compare two models without flagging the argv
+tapedeck diff a.json b.json --fail-on tools,files     # CI gate: only new tool calls or file changes fail
+tapedeck diff a.json b.json --tool-key name --json    # ignore tool arguments; machine-readable output
+```
+
+Calls are aligned by normalized request, so one inserted call shows up as `ADDED` instead of shifting every later pair (`--pair index` to align by position). From Python: `tapedeck.diff_cassettes(Cassette.load(a), Cassette.load(b))`. Tool extraction reads Claude Code `stream-json` transcripts; for other CLIs, requests, exit codes, files and the final output are compared.
+
 ## Features
 
 | | real agent | mock `subprocess` | hand-written fake CLI | **tapedeck** |
@@ -106,6 +150,7 @@ with use_cassette("tests/cassettes/run.json", mode="once", bins=["claude"]) as d
 | Failure injection (hang, crash, lying agent) | ❌ | ⚠️ | ⚠️ per project | ✅ built in |
 | Secrets kept out of fixtures | n/a | n/a | n/a | ✅ redact + `scan` |
 | Drifts from the real CLI | never | always | always | re-record in one flag |
+| See what changed between models / CLI versions | ❌ | ❌ | ❌ | ✅ `tapedeck diff` |
 
 ### Modes
 
@@ -162,6 +207,7 @@ tapedeck play   -c CASSETTE -- claude -p "..."        # one replayed call
 tapedeck ls     CASSETTE                              # table of interactions
 tapedeck show   CASSETTE INDEX [--json]               # print a recorded transcript
 tapedeck scan   CASSETTE ...                          # exit 1 on credential-shaped strings (pre-commit / CI)
+tapedeck diff   OLD [NEW] [--fail-on KINDS] [--json]  # behavioural diff; one arg = vs. git HEAD
 tapedeck synth  -c CASSETTE --result TEXT [--format stream-json|json|text] [--write P=C] [--when-stdin-contains S]
 tapedeck shim   --dir DIR [--bin NAME]                # write shims for a custom CI setup
 ```
@@ -173,7 +219,7 @@ tapedeck shim   --dir DIR [--bin NAME]                # write shims for a custom
 Cassettes are meant to be committed, so tapedeck treats them as untrusted *and* as potentially leaky:
 
 * **Redaction at record time:** values of env vars named like `*KEY*`, `*TOKEN*`, `*SECRET*`, `*PASSWORD*`, `*AUTH*`, `*CREDENTIAL*`; Anthropic, OpenAI, GitHub, AWS, Google and Slack token shapes; bearer tokens; anything in `TAPEDECK_REDACT`. The live caller still sees real output; only the tape is scrubbed.
-* **`tapedeck scan`** re-checks committed cassettes; wire it into pre-commit or CI.
+* **`tapedeck scan`** re-checks committed cassettes; wire it into pre-commit or CI. It also warns (without failing) when your OS username appears as a word, e.g. from an agent's `ls -l` or `whoami` output, which path tokenization cannot see; re-record with `TAPEDECK_REDACT=<username>` to scrub it.
 * **Path safety on replay:** effect paths must be relative, may not contain `..`, and may not traverse a symlink out of the working directory. A tampered cassette cannot write outside the test dir.
 * **Not covered (be honest with yourself):** PEM key blocks and arbitrary high-entropy strings are not detected. The init event of a Claude transcript lists your MCP servers, plugins and skills; record with `--strict-mcp-config` (as the [example](examples/agent_pipeline.py) does) and read the diff before committing.
 
@@ -186,8 +232,9 @@ Cassettes are meant to be committed, so tapedeck treats them as untrusted *and* 
 
 ## Roadmap
 
-- [ ] `tapedeck diff A.json B.json`: semantic diff of two recordings (tools called, files touched, result), to see what changed when a model or CLI version moves
-- [ ] Scheduled re-record in CI with a drift report ("the agent stopped calling `Write`")
+- [x] `tapedeck diff A.json B.json`: behavioural diff of two recordings (0.2.0)
+- [ ] Scheduled re-record in CI that posts the `tapedeck diff` report on a pull request
+- [ ] Tool-call extraction for Codex and Gemini CLI JSON transcripts
 - [ ] Node/TypeScript test-runner adapters (vitest/jest) on top of the same shims
 - [ ] Bidirectional `--input-format stream-json` sessions
 - [ ] Windows shims (`.cmd`)

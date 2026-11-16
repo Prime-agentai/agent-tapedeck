@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "generator": "tapedeck",
+  "interactions": [
+    {
+      "program": "claude",
+      "request": {
+        "argv": [
+          "-p",
+          "calc.py has a bug. Fix it, add a pytest test file for add(), run the tests with python -m pytest -q, and reply with only JSON: {\"fixed\": true, \"files\": [<files you changed or created>]}",
+          "--output-format",
+          "stream-json",
+          "--verbose",
+          "--model",
+          "sonnet",
+          "--allowedTools",
+          "Read,Write,Edit,Bash(python -m pytest:*),Bash(python3 -m pytest:*)"
+        ],
+        "stdin": "",
+        "cwd": "@@TAPEDECK_CWD@@"
+      },
+      "response": {
+        "exit_code": 0,
+        "duration": 7.2382,
+        "events": [
+          {
+            "t": 1.1375,
+            "fd": 1,
+            "text": "{\"type\":\"system\",\"subtype\":\"init\",\"cwd\":\"@@TAPEDECK_CWD@@\",\"session_id\":\"650b70ed-b8bf-4d37-8064-643dba804174\",\"tools\":[\"Task\",\"Bash\",\"CronCreate\",\"CronDelete\",\"CronList\",\"DesignSync\",\"Edit\",\"EnterWorktree\",\"ExitWorktree\",\"ListAgents\",\"Monitor\",\"NotebookEdit\",\"PushNotification\",\"Read\",\"RemoteTrigger\",\"ReportFindings\",\"ScheduleWakeup\",\"SendMessage\",\"Skill\",\"TaskStop\",\"ToolSearch\",\"WebFetch\",\"WebSearch\",\"Write\"],\"mcp_servers\":[{\"name\":\"claude.ai Claude Docs\",\"status\":\"pending\",\"source\":\"claudeai\"},{\"name\":\"claude.ai Google Drive\",\"status\":\"needs-auth\",\"source\":\"claudeai\"},{\"name\":\"claude.ai Gmail\",\"status\":\"needs-auth\",\"source\":\"claudeai\"},{\"name\":\"claude.ai Google Calendar\",\"status\":\"needs-auth\",\"source\":\"claudeai\"}],\"model\":\"claude-sonnet-5-5\",\"permissionMode\":\"default\",\"slash_commands\":[\"design\",\"design-sync\",\"dataviz\",\"update-config\",\"verify\",\"debug\",\"code-review\",\"simplify\",\"batch\",\"fewer-permission-prompts\",\"doctor\",\"loop\",\"schedule\",\"claude-api\",\"run\",\"run-skill-generator\",\"plugin-authoring\",\"advisor\",\"agents\",\"auto-mode-setup\",\"autocompact\",\"clear\",\"color\",\"compact\",\"config\",\"output-style\",\"context\",\"effort\",\"fast\",\"focus\",\"heapdump\",\"init\",\"mcp\",\"import\",\"model\",\"__remote-workflow\",\"workflow-launch-exec\",\"reload-plugins\",\"reload-skills\",\"rename\",\"ultrareview\",\"security-review\",\"usage-credits\",\"extra-usage\",\"usage\",\"insights\",\"recap\",\"skill-doctor\",\"goal\",\"design-consent\",\"design-revoke\",\"list-agents\",\"team-onboarding\"],\"terminal_slash_commands\":[\"doctor\",\"color\",\"focus\",\"reload-plugins\"],\"apiKeySource\":\"none\",\"claude_code_version\":\"2.1.323\",\"output_style\":\"default\",\"agents\":[\"claude\",\"Explore\",\"general-purpose\",\"Plan\",\"statusline-setup\"],\"skills\":[\"design\",\"design-sync\",\"dataviz\",\"update-config\",\"verify\",\"debug\",\"code-review\",\"simplify\",\"batch\",\"fewer-permission-prompts\",\"doctor\",\"loop\",\"schedule\",\"claude-api\",\"run\",\"run-skill-generator\",\"plugin-authoring\"],\"plugins\":[{\"name\":\"cc-plugin-agents-md\",\"path\":\"builtin\",\"source\":\"cc-plugin-agents-md@builtin\"},{\"name\":\"cc-plugin-telemetry\",\"path\":\"builtin\",\"source\":\"cc-plugin-telemetry@builtin\"},{\"name\":\"cc-plugin-privacy\",\"path\":\"builtin\",\"source\":\"cc-plugin-privacy@builtin\"},{\"name\":\"cc-plugin-plugin-authoring\",\"path\":\"builtin\",\"source\":\"cc-plugin-plugin-authoring@builtin\"}],\"capabilities\":[\"interrupt_receipt_v1\",\"interrupt_cancel_queued_v1\",\"interrupt_send_now_v1\",\"interrupt_requeue_taken_v1\",\"msg_lifecycle_v1\",\"request_marker_lists_v1\",\"ask_user_question_unanswered_v1\",\"lifecycle_wakeup_source_v1\",\"sdk_mcp_tools_list_changed\",\"sdk_mcp_manifests\",\"mcp_read_resource_v1\",\"mcp_tool_ui_meta_v1\",\"ui_surface_v1\",\"mcp_call_result_not_for_model_v1\",\"mcp_call_check_permissions_v1\",\"voice_call_talk_line_v1\",\"withdrawn_files_note_v2\",\"ui_pane_widget_v1\"],\"analytics_disabled\":false,\"product_feedback_disabled\":false,\"uuid\":\"f7baa462-8a02-4eb8-a0d8-a9edb55a5c92\",\"memory_paths\":{\"auto\":\"~/.claude/projects/-tmp-tmp-IiQVDhm8XL-sonnet/memory/\"},\"original_cwd\":\"@@TAPEDECK_CWD@@\",\"additional_directories\":[],\"messaging_socket_path\":\"/tmp/cc-socks-1000/3665454.sock\",\"fast_mode_state\":\"off\",\"fast_mode_disabled_reason\":\"sdk_opt_in_required\",\"per_turn_effort_active\":true,\"ultrathink_available\":false,\"ultrathink_typed_raises\":false,\"view_mode\":\"default\"}\n"
+          },
+          {
+            "t": 2.2817,
+            "fd": 1,
+            "text": "{\"type\":\"assistant\",\"message\":{\"model\":\"claude-sonnet-5-5\",\"id\":\"msg_011Ch6BjhVEw3hBuQk5Jcghx\",\"type\":\"message\",\"role\":\"assistant\",\"content\":[{\"type\":\"tool_use\",\"id\":\"toolu_01KA5H7vjsyDrHEPwQcuCAuH\",\"name\":\"Read\",\"input\":{\"file_path\":\"@@TAPEDECK_CWD@@/calc.py\"},\"caller\":{\"type\":\"direct\"}}],\"container\":null,\"stop_reason\":null,\"stop_sequence\":null,\"stop_details\":null,\"usage\":{\"input_tokens\":2,\"cache_creation_input_tokens\":5829,\"cache_read_input_tokens\":9002,\"cache_creation\":{\"ephemeral_5m_input_tokens\":0,\"ephemeral_1h_input_tokens\":5829},\"output_tokens\":16,\"service_tier\":\"standard\",\"inference_geo\":\"global\",\"speed\":\"standard\"},\"input_transformations\":[],\"diagnostics\":null,\"context_management\":null},\"parent_tool_use_id\":null,\"session_id\":\"650b70ed-b8bf-4d37-8064-643dba804174\",\"uuid\":\"e75cf9ff-0301-41b5-818d-7fa5cbac21c5\",\"timestamp\":\"2026-11-16T07:08:07.192Z\",\"request_id\":\"req_011Ch6BjhKpasoiJfeHcs9c7\",\"wire_tool_inputs\":{\"toolu_01KA5H7vjsyDrHEPwQcuCAuH\":{\"file_path\":\"@@TAPEDECK_CWD@@/calc.py\"}}}\n"
+          },
+          {
+            "t": 2.3283,
+            "fd": 1,
+            "text": "{\"type\":\"rate_limit_event\",\"rate_limit_info\":{\"status\":\"allowed\",\"resetsAt\":1794830400,\"rateLimitType\":\"five_hour\",\"overageStatus\":\"rejected\",\"overageDisabledReason\":\"org_level_disabled\",\"isUsingOverage\":false,\"unifiedWindows\":{\"five_hour\":{\"utilization\":0.12,\"resetsAt\":1794830400,\"status\":\"allowed\"},\"seven_day\":{\"utilization\":0.06,\"resetsAt\":1795136400,\"status\":\"allowed\"}}},\"uuid\":\"dd6e686c-26ca-41b5-af93-e6fb0b39b0ac\",\"session_id\":\"650b70ed-b8bf-4d37-8064-643dba804174\"}\n"
+          },
+          {
+            "t": 2.3696,
+            "fd": 1,
+            "text": "{\"type\":\"user\",\"message\":{\"role\":\"user\",\"content\":[{\"tool_use_id\":\"toolu_01KA5H7vjsyDrHEPwQcuCAuH\",\"type\":\"tool_result\",\"content\":\"1\\tdef add(a, b):\\n2\\t    return a - b\\n3\\t\"}]},\"parent_tool_use_id\":null,\"session_id\":\"650b70ed-b8bf-4d37-8064-643dba804174\",\"uuid\":\"a20cfad3-fa0d-4457-9218-bbe509e11be9\",\"timestamp\":\"2026-11-16T07:08:07.283Z\",\"tool_use_result\":{\"type\":\"text\",\"file\":{\"filePath\":\"@@TAPEDECK_CWD@@/calc.py\",\"content\":\"def add(a, b):\\n    return a - b\\n\",\"numLines\":3,\"startLine\":1,\"totalLines\":3}},\"tool_result_meta\":[{\"id\":\"toolu_01KA5H7vjsyDrHEPwQcuCAuH\",\"permission_decision\":{\"decision\":\"accept\",\"source\":\"config\",\"reason_type\":\"rule\"}}]}\n"
+          },
+          {
+            "t": 3.4541,
+            "fd": 1,
+            "text": "{\"type\":\"assistant\",\"message\":{\"model\":\"claude-sonnet-5-5\",\"id\":\"msg_011Ch6Bjn83domjJSccY53oM\",\"type\":\"message\",\"role\":\"assistant\",\"content\":[{\"type\":\"tool_use\",\"id\":\"toolu_012HuewCy8dLb6ddY8DYaazU\",\"name\":\"Write\",\"input\":{\"file_path\":\"@@TAPEDECK_CWD@@/calc.py\",\"content\":\"def add(a, b):\\n    return a + b\\n\"},\"caller\":{\"type\":\"direct\"}}],\"container\":null,\"stop_reason\":null,\"stop_sequence\":null,\"stop_details\":null,\"usage\":{\"input_tokens\":2,\"cache_creation_input_tokens\":2112,\"cache_read_input_tokens\":14831,\"cache_creation\":{\"ephemeral_5m_input_tokens\":0,\"ephemeral_1h_input_tokens\":2112},\"output_tokens\":16,\"service_tier\":\"standard\",\"inference_geo\":\"global\",\"speed\":\"standard\"},\"input_transformations\":[],\"diagnostics\":null,\"context_management\":null},\"parent_tool_use_id\":null,\"session_id\":\"650b70ed-b8bf-4d37-8064-643dba804174\",\"uuid\":\"e21370ee-b2a9-4629-b6dd-440fa030c90e\",\"timestamp\":\"2026-11-16T07:08:08.371Z\",\"request_id\":\"req_011Ch6BjmwtGrQQnodLJR9hF\",\"wire_tool_inputs\":{\"toolu_012HuewCy8dLb6ddY8DYaazU\":{\"file_path\":\"@@TAPEDECK_CWD@@/calc.py\",\"content\":\"def add(a, b):\\n    return a + b\\n\"}}}\n"
+          },
+          {
+            "t": 3.5225,
+            "fd": 1,
+            "text": "{\"type\":\"user\",\"message\":{\"role\":\"user\",\"content\":[{\"tool_use_id\":\"toolu_012HuewCy8dLb6ddY8DYaazU\",\"type\":\"tool_result\",\"content\":\"The file @@TAPEDECK_CWD@@/calc.py has been updated successfully. (file state is current in your context — no need to Read it back)\"}]},\"parent_tool_use_id\":null,\"session_id\":\"650b70ed-b8bf-4d37-8064-643dba804174\",\"uuid\":\"65d1b015-6221-4be8-a5aa-037ad8e00761\",\"timestamp\":\"2026-11-16T07:08:08.441Z\",\"tool_use_result\":{\"type\":\"update\",\"filePath\":\"@@TAPEDECK_CWD@@/calc.py\",\"content\":\"def add(a, b):\\n    return a + b\\n\",\"structuredPatch\":[{\"oldStart\":1,\"oldLines\":2,\"newStart\":1,\"newLines\":2,\"lines\":[\" def add(a, b):\",\"-    return a - b\",\"+    return a + b\"]}],\"originalFile\":\"def add(a, b):\\n    return a - b\\n\",\"userModified\":false},\"tool_result_meta\":[{\"id\":\"toolu_012HuewCy8dLb6ddY8DYaazU\",\"permission_decision\":{\"decision\":\"accept\",\"source\":\"config\",\"reason_type\":\"rule\"}}]}\n"
+          },
+          {
+            "t": 4.1647,
+            "fd": 1,
+            "text": "{\"type\":\"assistant\",\"message\":{\"model\":\"claude-sonnet-5-5\",\"id\":\"msg_011Ch6Bjn83domjJSccY53oM\",\"type\":\"message\",\"role\":\"assistant\",\"content\":[{\"type\":\"tool_use\",\"id\":\"toolu_011b8jf7r9HaY7FbUfgzurS7\",\"name\":\"Write\",\"input\":{\"file_path\":\"@@TAPEDECK_CWD@@/test_calc.py\",\"content\":\"from calc import add\\n\\n\\ndef test_add_positive():\\n    assert add(2, 3) == 5\\n\\n\\ndef test_add_negative():\\n    assert add(-1, -2) == -3\\n\\n\\ndef test_add_zero():\\n    assert add(0, 5) == 5\\n\"},\"caller\":{\"type\":\"direct\"}}],\"container\":null,\"stop_reason\":null,\"stop_sequence\":null,\"stop_details\":null,\"usage\":{\"input_tokens\":2,\"cache_creation_input_tokens\":2112,\"cache_read_input_tokens\":14831,\"cache_creation\":{\"ephemeral_5m_input_tokens\":0,\"ephemeral_1h_input_tokens\":2112},\"output_tokens\":16,\"service_tier\":\"standard\",\"inference_geo\":\"global\",\"speed\":\"standard\"},\"input_transformations\":[],\"diagnostics\":null,\"context_management\":null},\"parent_tool_use_id\":null,\"session_id\":\"650b70ed-b8bf-4d37-8064-643dba804174\",\"uuid\":\"e1ce8096-2e55-4e25-a2a9-db8d0eed737c\",\"timestamp\":\"2026-11-16T07:08:09.081Z\",\"request_id\":\"req_011Ch6BjmwtGrQQnodLJR9hF\",\"wire_tool_inputs\":{\"toolu_011b8jf7r9HaY7FbUfgzurS7\":{\"file_path\":\"@@TAPEDECK_CWD@@/test_calc.py\",\"content\":\"from calc import add\\n\\n\\ndef test_add_positive():\\n    assert add(2, 3) == 5\\n\\n\\ndef test_add_negative():\\n    assert add(-1, -2) == -3\\n\\n\\ndef test_add_zero():\\n    assert add(0, 5) == 5\\n\"}}}\n"
+          },
+          {
+            "t": 4.2143,
+            "fd": 1,
+            "text": "{\"type\":\"user\",\"message\":{\"role\":\"user\",\"content\":[{\"tool_use_id\":\"toolu_011b8jf7r9HaY7FbUfgzurS7\",\"type\":\"tool_result\",\"content\":\"File created successfully at: @@TAPEDECK_CWD@@/test_calc.py (file state is current in your context — no need to Read it back)\"}]},\"parent_tool_use_id\":null,\"session_id\":\"650b70ed-b8bf-4d37-8064-643dba804174\",\"uuid\":\"012007fc-c8c4-433c-8e41-b8e018f950d3\",\"timestamp\":\"2026-11-16T07:08:09.133Z\",\"tool_use_result\":{\"type\":\"create\",\"filePath\":\"@@TAPEDECK_CWD@@/test_calc.py\",\"content\":\"from calc import add\\n\\n\\ndef test_add_positive():\\n    assert add(2, 3) == 5\\n\\n\\ndef test_add_negative():\\n    assert add(-1, -2) == -3\\n\\n\\ndef test_add_zero():\\n    assert add(0, 5) == 5\\n\",\"structuredPatch\":[],\"originalFile\":null,\"userModified\":false},\"tool_result_meta\":[{\"id\":\"toolu_011b8jf7r9HaY7FbUfgzurS7\",\"permission_decision\":{\"decision\":\"accept\",\"source\":\"config\",\"reason_type\":\"rule\"}}]}\n"
+          },
+          {
+            "t": 5.2443,
+            "fd": 1,
+            "text": "{\"type\":\"assistant\",\"message\":{\"model\":\"claude-sonnet-5-5\",\"id\":\"msg_011Ch6Bjv33i4iDcHuyh6uCg\",\"type\":\"message\",\"role\":\"assistant\",\"content\":[{\"type\":\"tool_use\",\"id\":\"toolu_01EcadJapoqvwjCz1d51PGW1\",\"name\":\"Bash\",\"input\":{\"command\":\"python -m pytest -q 2>&1 | tail -5\"},\"caller\":{\"type\":\"direct\"}}],\"container\":null,\"stop_reason\":null,\"stop_sequence\":null,\"stop_details\":null,\"usage\":{\"input_tokens\":2,\"cache_creation_input_tokens\":446,\"cache_read_input_tokens\":16943,\"cache_creation\":{\"ephemeral_5m_input_tokens\":0,\"ephemeral_1h_input_tokens\":446},\"output_tokens\":16,\"service_tier\":\"standard\",\"inference_geo\":\"global\",\"speed\":\"standard\"},\"input_transformations\":[],\"diagnostics\":null,\"context_management\":null},\"parent_tool_use_id\":null,\"session_id\":\"650b70ed-b8bf-4d37-8064-643dba804174\",\"uuid\":\"be4c5715-5b0c-4360-92d2-e2798df6da50\",\"timestamp\":\"2026-11-16T07:08:10.153Z\",\"request_id\":\"req_011Ch6BjusdRnnV2at35QMBV\",\"wire_tool_inputs\":{\"toolu_01EcadJapoqvwjCz1d51PGW1\":{\"command\":\"cd @@TAPEDECK_CWD@@ && python -m pytest -q 2>&1 | tail -5\"}},\"wire_ingest_context\":{\"toolu_01EcadJapoqvwjCz1d51PGW1\":{\"cwd\":\"@@TAPEDECK_CWD@@\"}}}\n"
+          },
+          {
+            "t": 5.876,
+            "fd": 1,
+            "text": "{\"type\":\"user\",\"message\":{\"role\":\"user\",\"content\":[{\"tool_use_id\":\"toolu_01EcadJapoqvwjCz1d51PGW1\",\"type\":\"tool_result\",\"content\":\"...                                                                      [100%]\\n3 passed in 0.01s\",\"is_error\":false}]},\"parent_tool_use_id\":null,\"session_id\":\"650b70ed-b8bf-4d37-8064-643dba804174\",\"uuid\":\"bd574d93-c5ca-4076-8002-9448193a26b4\",\"timestamp\":\"2026-11-16T07:08:10.793Z\",\"tool_use_result\":{\"stdout\":\"...                                                                      [100%]\\n3 passed in 0.01s\",\"stderr\":\"\",\"interrupted\":false,\"isImage\":false,\"noOutputExpected\":false},\"tool_result_meta\":[{\"id\":\"toolu_01EcadJapoqvwjCz1d51PGW1\",\"permission_decision\":{\"decision\":\"accept\",\"source\":\"config\",\"reason_type\":\"subcommandResults\"}}]}\n"
+          },
+          {
+            "t": 6.713,
+            "fd": 1,
+            "text": "{\"type\":\"assistant\",\"message\":{\"model\":\"claude-sonnet-5-5\",\"id\":\"msg_011Ch6Bk33EiYdCXzZwhuiFs\",\"type\":\"message\",\"role\":\"assistant\",\"content\":[{\"type\":\"text\",\"text\":\"{\\\"fixed\\\": true, \\\"files\\\": [\\\"calc.py\\\", \\\"test_calc.py\\\"]}\"}],\"container\":null,\"stop_reason\":null,\"stop_sequence\":null,\"stop_details\":null,\"usage\":{\"input_tokens\":2,\"cache_creation_input_tokens\":118,\"cache_read_input_tokens\":17389,\"cache_creation\":{\"ephemeral_5m_input_tokens\":0,\"ephemeral_1h_input_tokens\":118},\"output_tokens\":30,\"service_tier\":\"standard\",\"inference_geo\":\"global\",\"speed\":\"standard\"},\"input_transformations\":[],\"diagnostics\":null,\"context_management\":null},\"parent_tool_use_id\":null,\"session_id\":\"650b70ed-b8bf-4d37-8064-643dba804174\",\"uuid\":\"5b9244cf-cf6b-4840-9d87-6ef5be2b3703\",\"timestamp\":\"2026-11-16T07:08:11.631Z\",\"request_id\":\"req_011Ch6Bk2rKujGDd4v9MP6Dm\"}\n"
+          },
+          {
+            "t": 6.7324,
+            "fd": 1,
+            "text": "{\"duration_api_ms\":4692,\"stop_reason\":\"end_turn\",\"session_id\":\"650b70ed-b8bf-4d37-8064-643dba804174\",\"total_cost_usd\":0.0446425,\"usage\":{\"input_tokens\":8,\"cache_creation_input_tokens\":8505,\"cache_read_input_tokens\":58165,\"output_tokens\":479,\"output_tokens_details\":{\"thinking_tokens\":0},\"server_tool_use\":{\"web_search_requests\":0,\"web_fetch_requests\":0},\"service_tier\":\"standard\",\"cache_creation\":{\"ephemeral_1h_input_tokens\":8505,\"ephemeral_5m_input_tokens\":0},\"inference_geo\":\"global\",\"iterations\":[{\"input_tokens\":2,\"output_tokens\":30,\"cache_read_input_tokens\":17389,\"cache_creation_input_tokens\":118,\"cache_creation\":{\"ephemeral_5m_input_tokens\":0,\"ephemeral_1h_input_tokens\":118},\"type\":\"message\"}],\"speed\":\"standard\",\"fallback_credit\":null},\"modelUsage\":{\"claude-sonnet-5-5\":{\"inputTokens\":8,\"outputTokens\":479,\"cacheReadInputTokens\":58165,\"cacheCreationInputTokens\":8505,\"webSearchRequests\":0,\"costUSD\":0.0446425,\"contextWindow\":1000000,\"maxOutputTokens\":128000,\"thinkingTokens\":0,\"cacheCreationEphemeral5mInputTokens\":0,\"cacheCreationEphemeral1hInputTokens\":8505,\"canonicalModel\":\"claude-sonnet-5-5\",\"provider\":\"firstParty\",\"costBasis\":\"list\"}},\"permission_denials\":[],\"terminal_reason\":\"completed\",\"fast_mode_state\":\"off\",\"fast_mode_disabled_reason\":\"sdk_opt_in_required\",\"subagent_stats\":{\"spawned\":0,\"requested\":{\"background\":0,\"foreground\":0,\"unset\":0},\"started_in_background\":0,\"max_depth\":0,\"spawned_by_subagents\":0,\"completed\":0,\"failed\":0,\"killed\":{\"parent\":0,\"user\":0,\"system\":0},\"refused\":{\"depth_limit\":0,\"concurrency_limit\":0,\"budget\":0},\"by_type\":{}},\"safety_stops\":0,\"is_error\":false,\"num_turns\":5,\"subtype\":\"success\",\"api_error_status\":null,\"result\":\"{\\\"fixed\\\": true, \\\"files\\\": [\\\"calc.py\\\", \\\"test_calc.py\\\"]}\",\"ttft_ms\":1463,\"type\":\"result\",\"duration_ms\":5918,\"uuid\":\"312ee242-2783-4059-bd04-f279e288f927\",\"ttft_stream_ms\":1081,\"time_to_request_ms\":447,\"first_content_frame_ms\":1082,\"queued_turn_count\":0,\"result_index\":0,\"model_usage_since_last_result\":{\"claude-sonnet-5-5\":{\"inputTokens\":8,\"outputTokens\":479,\"cacheReadInputTokens\":58165,\"cacheCreationInputTokens\":8505,\"webSearchRequests\":0,\"costUSD\":0.0446425,\"contextWindow\":1000000,\"maxOutputTokens\":128000,\"thinkingTokens\":0,\"cacheCreationEphemeral5mInputTokens\":0,\"cacheCreationEphemeral1hInputTokens\":8505,\"canonicalModel\":\"claude-sonnet-5-5\",\"provider\":\"firstParty\",\"costBasis\":\"list\"}},\"credential_expires_at\":\"2026-12-11T20:56:54.098Z\"}\n"
+          }
+        ],
+        "effects": [
+          {
+            "path": "calc.py",
+            "op": "write",
+            "text": "def add(a, b):\n    return a + b\n"
+          },
+          {
+            "path": "test_calc.py",
+            "op": "write",
+            "text": "from calc import add\n\n\ndef test_add_positive():\n    assert add(2, 3) == 5\n\n\ndef test_add_negative():\n    assert add(-1, -2) == -3\n\n\ndef test_add_zero():\n    assert add(0, 5) == 5\n"
+          }
+        ]
+      },
+      "recorded_at": "2026-11-16T07:08:12+00:00"
+    }
+  ]
+}

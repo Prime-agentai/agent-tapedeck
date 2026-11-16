@@ -155,13 +155,19 @@ class Cassette:
         p = Path(path)
         if not p.exists():
             return cls()
+        return cls.parse(p.read_text(encoding="utf-8"), str(p))
+
+    @classmethod
+    def parse(cls, text: str, source: str = "<cassette>") -> "Cassette":
         try:
-            raw = json.loads(p.read_text(encoding="utf-8"))
+            raw = json.loads(text)
         except json.JSONDecodeError as exc:
-            raise CassetteError(f"{p}: not valid JSON ({exc})") from exc
+            raise CassetteError(f"{source}: not valid JSON ({exc})") from exc
+        if not isinstance(raw, dict):
+            raise CassetteError(f"{source}: not a cassette (top level is not an object)")
         version = raw.get("version")
         if version != FORMAT_VERSION:
-            raise CassetteError(f"{p}: unsupported cassette version {version!r}")
+            raise CassetteError(f"{source}: unsupported cassette version {version!r}")
         return cls([Interaction.from_json(i) for i in raw.get("interactions", [])])
 
     def to_json(self) -> dict[str, Any]:

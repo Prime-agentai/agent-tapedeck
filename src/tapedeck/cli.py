@@ -5,6 +5,8 @@
     tapedeck play -c demo.json -- claude -p "hi" --output-format stream-json --verbose
     tapedeck ls demo.json | tapedeck show demo.json 0 | tapedeck scan tests/cassettes/*.json
     tapedeck synth -c demo.json --result '{"status":"ok"}' --write out.txt=hello
+    tapedeck diff old.json new.json        # did the agent behave differently? (exit 1 if so)
+    tapedeck diff tests/cassettes/run.json # working tree vs. git HEAD
 """
 
 from __future__ import annotations
@@ -12,6 +14,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -20,9 +23,11 @@ from pathlib import Path
 from . import __version__
 from .cassette import STDERR, Cassette, CassetteError, locked
 from .deck import DEFAULT_BINS, use_cassette, write_shims
+from .diff import KINDS, diff_cassettes
 from .dispatch import read_stdin, run_call
+from .matching import DEFAULT_IGNORE_FLAGS
 from .player import Fault, FaultError
-from .redact import scan_text
+from .redact import local_username, scan_text
 from .settings import MISS_EXIT_CODE, MODES, Settings
 from .synth import FORMATS, synth_interaction
 
@@ -81,6 +86,26 @@ def build_parser() -> argparse.ArgumentParser:
     shim.add_argument("--dir", required=True, type=Path)
     shim.add_argument("--bin", action="append", default=None)
     shim.set_defaults(func=cmd_shim)
+
+    df = sub.add_parser("diff", help="behavioural diff of two cassettes: requests, exit, tools, files, result",
+                        description="Compare what the agent did in two recordings. Exit 0 if no failing change, "
+                                    "1 if a change of a --fail-on kind was found, 2 on error.")
+    df.add_argument("old", type=Path, help="cassette before (or the only cassette, compared to --git REV)")
+    df.add_argument("new", type=Path, nargs="?", default=None, help="cassette after")
+    df.add_argument("--git", default="HEAD", metavar="REV",
+                    help="with one cassette: compare REV:path (default HEAD) to the working tree")
+    df.add_argument("--pair", choices=("request", "index"), default="request",
+                    help="align calls by normalized request (default) or by position")
+    df.add_argument("--tool-key", choices=("target", "name"), default="target",
+                    help="compare tool calls by name+target (default) or by name only")
+    df.add_argument("--ignore", default="", metavar="KINDS", help=f"comma list of kinds to skip: {','.join(KINDS[:5])}")
+    df.add_argument("--fail-on", default=",".join(KINDS), metavar="KINDS",
+                    help="comma list of kinds that make the exit code 1, or 'none' (default: all)")
+    df.add_argument("--ignore-flag", action="append", default=None,
+                    help="also ignore this flag's value, e.g. --ignore-flag=--model to compare models (repeatable)")
+    df.add_argument("--json", action="store_true", help="machine-readable output")
+    df.add_argument("-v", "--verbose", action="store_true", help="also list unchanged interactions")
+    df.set_defaults(func=cmd_diff)
 
     sy = sub.add_parser("synth", help="append a hand-authored interaction (no agent, no credentials)")
     sy.add_argument("-c", "--cassette", required=True, type=Path)
@@ -171,7 +196,64 @@ def cmd_scan(args: argparse.Namespace) -> int:
                 print(f"{f.where}: {f.kind} {f.excerpt}")
                 total += 1
     print(f"tapedeck scan: {total} finding(s) in {len(args.cassettes)} cassette(s)", file=sys.stderr)
+    _warn_username(args.cassettes)
     return 1 if total else 0
+
+
+def _warn_username(paths: list[Path], user: str | None = None) -> int:
+    """Privacy hint, never a failure: tool output such as `ls -l` or `whoami` can carry the
+    recording user's name into a cassette, where path tokenization cannot see it."""
+    user = local_username() if user is None else user
+    if len(user) < 3:
+        return 0
+    word = re.compile(rf"(?<![\w.-]){re.escape(user)}(?![\w-])")
+    hits = 0
+    for path in paths:
+        n = len(word.findall(path.read_text(encoding="utf-8", errors="replace")))
+        if n:
+            hits += n
+            print(f"tapedeck scan: warning: {path} contains your OS username {user!r} {n} time(s) "
+                  f"(e.g. in ls/whoami output); re-record with TAPEDECK_REDACT={user} to scrub it", file=sys.stderr)
+    return hits
+
+
+def _kinds(value: str, flag: str) -> set[str]:
+    if value.strip().lower() == "none":
+        return set()
+    kinds = {k.strip() for k in value.split(",") if k.strip()}
+    unknown = kinds - set(KINDS) - {"stats"}
+    if unknown:
+        raise ValueError(f"{flag}: unknown kind(s) {', '.join(sorted(unknown))}; expected {', '.join(KINDS)}")
+    return kinds
+
+
+def _git_cassette(rev: str, path: Path) -> Cassette:
+    if not path.exists():
+        raise ValueError(f"{path}: no such cassette")
+    proc = subprocess.run(["git", "show", f"{rev}:./{path.name}"], cwd=path.resolve().parent,
+                          capture_output=True, text=True)
+    if proc.returncode != 0:
+        raise ValueError(f"cannot read {path} at {rev}: {proc.stderr.strip() or 'git show failed'}")
+    return Cassette.parse(proc.stdout, f"{rev}:{path}")
+
+
+def cmd_diff(args: argparse.Namespace) -> int:
+    fail_on = _kinds(args.fail_on, "--fail-on")
+    ignore = _kinds(args.ignore, "--ignore")
+    if args.new is None:
+        old, new = _git_cassette(args.git, args.old), _load_existing(args.old)
+    else:
+        old, new = _load_existing(args.old), _load_existing(args.new)
+    flags = DEFAULT_IGNORE_FLAGS + tuple(args.ignore_flag or ())
+    result = diff_cassettes(old, new, pair_by=args.pair, tool_key=args.tool_key, ignore=ignore, ignore_flags=flags)
+    failing = result.failing(fail_on)
+    if args.json:
+        print(json.dumps(dict(result.to_json(), failing=sorted(failing)), indent=2, ensure_ascii=False))
+    else:
+        print(result.render(verbose=args.verbose))
+        if failing:
+            print(f"tapedeck diff: failing on {', '.join(sorted(failing))}", file=sys.stderr)
+    return 1 if failing else 0
 
 
 def cmd_shim(args: argparse.Namespace) -> int:

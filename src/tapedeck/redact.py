@@ -56,7 +56,7 @@ class Redactor:
         self._home = home if home is not None else str(Path.home())
         # pytest's basetemp (/tmp/pytest-of-<user>/) carries the username into paths and into
         # tools that derive names from the cwd (Claude Code's per-project memory dir).
-        self._user = user if user is not None else _username()
+        self._user = user if user is not None else local_username()
         literals = {
             value: name
             for name, value in env.items()
@@ -99,7 +99,7 @@ def scan_text(value: str, where: str) -> list[Finding]:
     return findings
 
 
-def _username() -> str:
+def local_username() -> str:
     try:
         return getpass.getuser()
     except Exception:  # no passwd entry in some containers
