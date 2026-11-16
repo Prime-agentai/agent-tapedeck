@@ -5,7 +5,7 @@
 > key, no network and no flakiness. When you switch models or CLI versions, `tapedeck diff` shows
 > what the agent now *does* differently: tools called, files written, final reply.
 
-![python](https://img.shields.io/badge/python-3.10%2B-blue) ![deps](https://img.shields.io/badge/runtime%20deps-0-brightgreen) ![license](https://img.shields.io/badge/license-MIT-green)
+[![CI](https://github.com/Prime-agentai/agent-tapedeck/actions/workflows/ci.yml/badge.svg)](https://github.com/Prime-agentai/agent-tapedeck/actions/workflows/ci.yml) ![python](https://img.shields.io/badge/python-3.10%2B-blue) ![deps](https://img.shields.io/badge/runtime%20deps-0-brightgreen) ![license](https://img.shields.io/badge/license-MIT-green)
 
 ## Why this exists
 
